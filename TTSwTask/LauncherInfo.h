@@ -1,19 +1,6 @@
 #pragma once
 #include "wndinfo.h"
 
-enum LII
-{
-	LII_TITLE,
-	LII_MODULEPATH,
-	LII_ARG,
-	LII_WORK,
-	LII_CHECKPATH,
-	LII_CHECKTITLE,
-	LII_ICONPATH,
-	LII_ICONIDX,
-	LII_MAX,
-};
-
 typedef struct LII_PARAMS
 {
 	LPTSTR		title;

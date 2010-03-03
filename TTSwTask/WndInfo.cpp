@@ -87,6 +87,7 @@ HICON CWndInfo::GetIcon(BOOL& need_destroy)
 
 void CWndInfo::SetActive(void)
 {
+	SetActiveWindow(m_hWnd);
 }
 
 void CWndInfo::Setup(HWND hwnd)
@@ -120,5 +121,42 @@ void CWndInfo::Setup(HWND hwnd)
 			}
 		}
 		CloseHandle(hProcess);
+	}
+}
+
+void CWndInfo::SetActiveWindow(HWND hwnd)
+{
+	DWORD	result;
+	
+	if(IsIconic(hwnd)){
+		OpenIcon(hwnd);
+	}
+	
+	HWND	prev_active = GetForegroundWindow();
+	if(prev_active != hwnd){
+		BringWindowToTop(hwnd);
+		SetWindowPos(hwnd, HWND_TOP, 0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+		if(!SetForegroundWindow(hwnd)){
+			if(!prev_active){
+				prev_active = FindWindow(_T("Shell_TrayWnd"), NULL);
+			}
+			DWORD	prev_thread = GetWindowThreadProcessId(prev_active, NULL);
+			DWORD	next_thread = GetWindowThreadProcessId(hwnd, NULL);
+			AttachThreadInput(prev_thread, next_thread, TRUE);
+			SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, &result, 0);
+			SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, 0, 0);
+			if(!SetForegroundWindow(hwnd)){
+				INPUT inp[4];
+				ZeroMemory(&inp, sizeof(inp));
+				inp[0].type = inp[1].type = inp[2].type = inp[3].type = INPUT_KEYBOARD;
+				inp[0].ki.wVk = inp[1].ki.wVk = inp[2].ki.wVk = inp[3].ki.wVk = VK_MENU;
+				inp[0].ki.dwFlags = inp[2].ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
+				inp[1].ki.dwFlags = inp[3].ki.dwFlags = KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP;
+				SendInput(4, inp, sizeof(INPUT));
+				SetForegroundWindow(hwnd);
+			}
+			SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (PVOID)result, 0);
+			AttachThreadInput(prev_thread, next_thread, FALSE);
+		}
 	}
 }

@@ -52,7 +52,7 @@ void CLauncherInfo::SetActive(void)
 	_tcscpy_s(args, 1024, _T("\""));
 	_tcscat_s(args, 1024, m_ModulePath);
 	_tcscat_s(args, 1024, _T("\" "));
-	_tcscat_s(args, 1024, m_Arg);
+	if(m_Arg) _tcscat_s(args, 1024, m_Arg);
 	result = CreateProcess(NULL, args, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, m_WorkDirectory, &si, &pi);
 	if(result)
 	{
