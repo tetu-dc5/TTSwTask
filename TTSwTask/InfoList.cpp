@@ -65,7 +65,7 @@ void CInfoList::RemoveAll(int channel)
 	if(channel<0) channel=m_current_channel;
 	if(m_node[channel])
 	{
-		delete m_node[channel];
+		m_node[channel]->Unlink(channel);
 		m_node[channel] = NULL;
 	}
 }
