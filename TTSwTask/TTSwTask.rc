@@ -33,7 +33,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_TTSWTASK            ICON                    "TTSwTask.ico"
+IDI_TTSWTASK            ICON                    "Resource\\network_center.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -64,6 +64,23 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "タスクトレイ"
+    BEGIN
+        MENUITEM "設定ファイルの更新(&U)",               ID_UPDATE_CONFIG
+        MENUITEM "リスト表示(&V)",                   ID_VIEW_LIST
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)",                      ID_APP_QUIT
+    END
+END
 
 #endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
