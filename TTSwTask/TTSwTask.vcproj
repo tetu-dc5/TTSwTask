@@ -292,11 +292,19 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\Resource\icon1.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\Resource\network_center.ico"
 				>
 			</File>
 			<File
 				RelativePath=".\TTSwTask.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\Resource\VSProject_genericproject.ico"
 				>
 			</File>
 		</Filter>
