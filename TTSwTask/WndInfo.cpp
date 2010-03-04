@@ -92,32 +92,24 @@ void CWndInfo::SetActive(void)
 
 void CWndInfo::Setup(HWND hwnd)
 {
-	LPTSTR	tmp;
-	TCHAR	buf[1024];
-	int		len;
+	TCHAR	buf[TMP_BUF_SIZE];
 
 	m_hWnd = hwnd;
 	m_Selected = FALSE;
 	m_Title      = NULL;
 	m_ModulePath = NULL;
 	GetWindowThreadProcessId(hwnd, &m_PID);
-	GetWindowText(hwnd, buf, 1024);
-	len = _tcslen(buf);
-	tmp = new TCHAR[len+10];
-	_tcscpy_s(tmp, len+10, buf);
-	m_Title = tmp;
+	GetWindowText(hwnd, buf, TMP_BUF_SIZE);
+	m_Title = CopyString(buf);
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, m_PID);
 	if(hProcess){
 		HMODULE hModule;
 		DWORD	cbModule;
 		if(EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbModule))
 		{
-			if(GetModuleFileNameEx(hProcess, hModule, buf, 1024))
+			if(GetModuleFileNameEx(hProcess, hModule, buf, TMP_BUF_SIZE))
 			{
-				len = _tcslen(buf);
-				tmp = new TCHAR[len+10];
-				_tcscpy_s(tmp, len+10, buf);
-				m_ModulePath = tmp;
+				m_ModulePath = CopyString(buf);
 			}
 		}
 		CloseHandle(hProcess);
@@ -129,7 +121,8 @@ void CWndInfo::SetActiveWindow(HWND hwnd)
 	DWORD	result;
 	
 	if(IsIconic(hwnd)){
-		OpenIcon(hwnd);
+		//OpenIcon(hwnd);
+		ShowWindowAsync(hwnd, SW_RESTORE);
 	}
 	
 	HWND	prev_active = GetForegroundWindow();

@@ -11,7 +11,6 @@ private:
 	void	DestroyParams(void);
 	void	FlashParams(void);
 	LPTSTR	TrimLeft(LPTSTR src);
-	LPTSTR	CopyString(LPCTSTR src);
 public:
 	CLauncher(void);
 	virtual ~CLauncher(void);

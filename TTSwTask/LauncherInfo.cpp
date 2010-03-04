@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "TTSwTask.h"
 #include "LauncherInfo.h"
 
 CLauncherInfo::CLauncherInfo(void)
@@ -42,17 +43,17 @@ void CLauncherInfo::SetActive(void)
 {
 	STARTUPINFO			si;
 	PROCESS_INFORMATION	pi;
-	TCHAR				args[1024];
+	TCHAR				args[TMP_BUF_SIZE];
 	BOOL				result;
 	DWORD				err;
 	LPVOID				lpMsg;
 
 	ZeroMemory(&si, sizeof(STARTUPINFO));
 	si.cb = sizeof(STARTUPINFO);
-	_tcscpy_s(args, 1024, _T("\""));
-	_tcscat_s(args, 1024, m_ModulePath);
-	_tcscat_s(args, 1024, _T("\" "));
-	if(m_Arg) _tcscat_s(args, 1024, m_Arg);
+	_tcscpy_s(args, TMP_BUF_SIZE, _T("\""));
+	_tcscat_s(args, TMP_BUF_SIZE, m_ModulePath);
+	_tcscat_s(args, TMP_BUF_SIZE, _T("\" "));
+	if(m_Arg) _tcscat_s(args, TMP_BUF_SIZE, m_Arg);
 	result = CreateProcess(NULL, args, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS, NULL, m_WorkDirectory, &si, &pi);
 	if(result)
 	{
