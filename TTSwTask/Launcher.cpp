@@ -150,7 +150,7 @@ BOOL CLauncher::ReadFromFile(LPCTSTR fname)
 			p = TrimLeft(p+1);
 			LPTSTR	file  = _tcstok_s(p, _T(","), &context);
 			_tcscpy_s(m_params.iconpath, 1024, file);
-			LPTSTR	index = _tcstok_s(p, _T(","), &context);
+			LPTSTR	index = _tcstok_s(NULL, _T(","), &context);
 			if(index !=NULL)
 			{
 				int num = _tstoi(index);
