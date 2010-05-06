@@ -27,4 +27,5 @@ public:
 			BOOL	Enable(void)		{	return m_Title ? (m_Title[0] ? TRUE : FALSE) : FALSE;	}
 			void	SetSelect(BOOL sw)	{	m_Selected = sw;				}
 			BOOL	IsSelected(void)	{	return m_Selected;				}
+	static	void	SetActiveWindow(HWND hwnd);
 };

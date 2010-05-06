@@ -4,10 +4,15 @@
 #include "stdafx.h"
 #include "TTSwTask.h"
 #include <shellapi.h>
+#include "..\KbHook\KbHook.h"
 
 #pragma	comment(lib, "msimg32.lib")
 
+#define		ENABLE_HOOK		1
+
 #define		WM_TASKICON		(WM_USER+1)
+#define		WM_SP_KEYDOWN	(WM_USER+2)
+#define		WM_SP_KEYUP		(WM_USER+3)
 
 HINSTANCE		g_hInst       = NULL;
 HWND			g_hWnd        = NULL;
@@ -20,6 +25,7 @@ HGDIOBJ			g_LaunchFont  = NULL;
 LPCTSTR			g_AppName     = _T("TTSwTask");
 HMENU			g_AppMenu     = NULL;
 NOTIFYICONDATA	g_Notify;
+BOOL			g_Shift       = FALSE;
 
 static const int	g_ItemHeight  = 20;
 static const int	g_ItemIconX   = 2;
@@ -30,19 +36,23 @@ static const int	g_MinWidth    = 400;
 static const int	g_MaxWidth    = 800;
 static const int	g_TextMargin  = 2;
 
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL				OnCreate(HWND hwnd);
-void				OnPaint(HWND hwnd, HDC hdc);
-void				GetIniPath(void);
-void				OnListUpdate(void);
-void				GetItemRect(int idx, LPRECT lpRect);
-void				FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2);
-void				OnDestroy(HWND hwnd);
-void				InvalidateItem(int idx);
-int					GetItemWidth(LPCTSTR title);
-void				MenuOpen(void);
+static LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+static ATOM	MyRegisterClass(HINSTANCE hInstance);
+static BOOL	InitInstance(HINSTANCE, int);
+static BOOL	OnCreate(HWND hwnd);
+static void	OnPaint(HWND hwnd, HDC hdc);
+static void	GetIniPath(void);
+static void	OnListUpdate(void);
+static void	GetItemRect(int idx, LPRECT lpRect);
+static void	FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2);
+static void	OnDestroy(HWND hwnd);
+static void	InvalidateItem(void);
+static int		GetItemWidth(LPCTSTR title);
+static void	MenuOpen(void);
+static void	OnSpKeyDown(WPARAM wParam, LPARAM lParam);
+static void	OnSpKeyUp(WPARAM wParam, LPARAM lParam);
+static int		PointToItem(POINTS pt);
+static void	HideWindow(void);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 {
@@ -66,7 +76,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	return (int) msg.wParam;
 }
 
-ATOM MyRegisterClass(HINSTANCE hInstance)
+static ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize         = sizeof(WNDCLASSEX);
@@ -84,7 +94,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
-void GetIniPath(void)
+static void GetIniPath(void)
 {
 	TCHAR	me[1024];
 	GetModuleFileName(NULL, me, 1024);
@@ -96,7 +106,7 @@ void GetIniPath(void)
 	_tcscpy_s((LPTSTR)g_IniPath, len+10, me);
 }
 
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	HWND hWnd;
 	g_hInst = hInstance;
@@ -120,7 +130,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
@@ -144,6 +154,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if(LOWORD(wParam) == ID_UPDATE_CONFIG)
 		{
+			HideWindow();
+			g_Launcher->ReadFromFile(g_IniPath);
 		}
 		else
 		{
@@ -153,26 +165,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		if(!OnCreate(hWnd)) return -1;
 		break;
-	case WM_LBUTTONDOWN:
+	#if ENABLE_HOOK
+	case WM_SP_KEYDOWN:
+		OnSpKeyDown(wParam, lParam);
 		break;
+	case WM_SP_KEYUP:
+		OnSpKeyUp(wParam, lParam);
+		break;
+	#else
 	case WM_KEYDOWN:
-		if(IsWindowVisible(hWnd)){
-			if(wParam==VK_UP)
+		if(wParam==VK_DOWN)
+		{
+			g_WndList->MoveCursor(1);
+			InvalidateItem();
+		}
+		else if(wParam==VK_UP)
+		{
+			g_WndList->MoveCursor(-1);
+			InvalidateItem();
+		}
+		else if(wParam==VK_RETURN)
+		{
+			g_WndList->Activate();
+			HideWindow();
+		}
+		else
+		{
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+	#endif
+	case WM_LBUTTONDOWN:
+		if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
+		{
+			InvalidateItem();
+		}
+		break;
+	case WM_LBUTTONUP:
+		if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
+		{
+			g_WndList->Activate();
+			HideWindow();
+		}
+		break;
+	case WM_MOUSEMOVE:
+		if(wParam & MK_LBUTTON){
+			if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
 			{
-				g_WndList->MoveCursor(-1);
-				InvalidateItem(g_WndList->GetSelectedIndex());
-				InvalidateItem(g_WndList->GetLastSelectedIndex());
-				return 0;
-			}
-			else if(wParam==VK_DOWN)
-			{
-				g_WndList->MoveCursor(1);
-				InvalidateItem(g_WndList->GetSelectedIndex());
-				InvalidateItem(g_WndList->GetLastSelectedIndex());
-				return 0;
+				InvalidateItem();
 			}
 		}
-		return DefWindowProc(hWnd, message, wParam, lParam);
+		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		OnPaint(hWnd, hdc);
@@ -191,7 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-BOOL OnCreate(HWND hwnd)
+static BOOL OnCreate(HWND hwnd)
 {
 	g_ImageList = new CImageList();
 	g_ImageList->Create();
@@ -202,8 +244,8 @@ BOOL OnCreate(HWND hwnd)
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &NcMetrics, 0);
 	logfont = NcMetrics.lfMenuFont;
 	logfont.lfHeight  = 15;
-	logfont.lfWeight  = FW_NORMAL;
-	logfont.lfQuality = DEFAULT_QUALITY;
+	logfont.lfWeight  = FW_MEDIUM;
+	logfont.lfQuality = NONANTIALIASED_QUALITY;	//DEFAULT_QUALITY;
 	g_NormalFont      = CreateFontIndirect(&logfont);
 	logfont.lfItalic  = TRUE;
 	g_LaunchFont      = CreateFontIndirect(&logfont);
@@ -222,13 +264,18 @@ BOOL OnCreate(HWND hwnd)
 	_tcscpy_s(g_Notify.szTip, 64, g_AppName);
 	Shell_NotifyIcon(NIM_ADD, &g_Notify);
 
-	OnListUpdate();
+	#if ENABLE_HOOK
+	Hook(hwnd, WM_SP_KEYDOWN, WM_SP_KEYUP);	
+	#endif
 	
 	return TRUE;
 }
 
-void OnDestroy(HWND hwnd)
+static void OnDestroy(HWND hwnd)
 {
+	#if ENABLE_HOOK
+	Unhook();	
+	#endif
 	Shell_NotifyIcon(NIM_DELETE, &g_Notify);
 	DestroyMenu(g_AppMenu);
 	if(g_ImageList) delete g_ImageList;
@@ -236,7 +283,7 @@ void OnDestroy(HWND hwnd)
 	DeleteObject(g_LaunchFont);
 }
 
-void GetItemRect(int idx, LPRECT lpRect)
+static void GetItemRect(int idx, LPRECT lpRect)
 {
 	RECT	client;
 	GetClientRect(g_hWnd, &client);
@@ -247,14 +294,25 @@ void GetItemRect(int idx, LPRECT lpRect)
 	lpRect->bottom = (idx+1) * g_ItemHeight;
 }
 
-void InvalidateItem(int idx)
+static int PointToItem(POINTS pt)
 {
-	RECT	rect;
-	GetItemRect(idx, &rect);
-	InvalidateRect(g_hWnd, &rect, TRUE);
+	return pt.y / g_ItemHeight;
 }
 
-void FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2)
+static void InvalidateItem(void)
+{
+	RECT	rect;
+	
+	if(g_WndList->GetSelectedIndex() != g_WndList->GetLastSelectedIndex())
+	{
+		GetItemRect(g_WndList->GetSelectedIndex(), &rect);
+		InvalidateRect(g_hWnd, &rect, TRUE);
+		GetItemRect(g_WndList->GetLastSelectedIndex(), &rect);
+		InvalidateRect(g_hWnd, &rect, TRUE);
+	}
+}
+
+static void FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2)
 {
 	TRIVERTEX		vt[2];
 	GRADIENT_RECT	rc;
@@ -279,7 +337,7 @@ void FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2)
 	GradientFill(hdc, vt, 2, &rc, 1, GRADIENT_FILL_RECT_H);
 }
 
-void OnPaint(HWND hwnd, HDC hdc)
+static void OnPaint(HWND hwnd, HDC hdc)
 {
 	HGDIOBJ old_font = SelectObject(hdc, g_NormalFont);
 	
@@ -324,7 +382,7 @@ void OnPaint(HWND hwnd, HDC hdc)
 	SelectObject(hdc, old_font);
 }
 
-int GetItemWidth(LPCTSTR title)
+static int GetItemWidth(LPCTSTR title)
 {
 	HDC	hdc = GetDC(g_hWnd);
 	HGDIOBJ	old = SelectObject(hdc, g_NormalFont);
@@ -336,7 +394,7 @@ int GetItemWidth(LPCTSTR title)
 	return (!result) ? 400 : size.cx;
 }
 
-void OnListUpdate(void)
+static void OnListUpdate(void)
 {
 	g_WndList->Create(g_Launcher);
 	int count = g_WndList->GetCount();
@@ -352,6 +410,10 @@ void OnListUpdate(void)
 		}
 		int w = GetItemWidth((*g_WndList)[i]->GetTitle());
 		if(w>width) width = w;
+		if(i==1 && !(*g_WndList)[i]->IsLauncher())
+		{
+			g_WndList->MoveCursor(1);
+		}
 	}
 	int fw = GetSystemMetrics(SM_CXFRAME) * 2;
 	int fh = GetSystemMetrics(SM_CYFRAME) * 2;
@@ -365,9 +427,10 @@ void OnListUpdate(void)
 	int y  = (sh - wh) / 2;
 	SetWindowPos(g_hWnd, (HWND)HWND_TOPMOST, x, y, ww, wh, SWP_SHOWWINDOW|SWP_NOCOPYBITS);
 	InvalidateRect(g_hWnd, NULL, TRUE);
+	CWndInfo::SetActiveWindow(g_hWnd);
 }
 
-void MenuOpen(void)
+static void MenuOpen(void)
 {
 	POINT	pt;
 	
@@ -375,4 +438,62 @@ void MenuOpen(void)
 	GetCursorPos(&pt);
 	HMENU hSub = GetSubMenu(g_AppMenu, 0);
 	TrackPopupMenu(hSub, TPM_LEFTALIGN|TPM_BOTTOMALIGN|TPM_LEFTBUTTON, pt.x, pt.y, 0, g_hWnd, NULL);
+}
+
+static void OnSpKeyDown(WPARAM wParam, LPARAM lParam)
+{
+	switch(wParam){
+	case	VK_TAB:
+		if(!IsWindowVisible(g_hWnd)){
+			OnListUpdate();
+		}
+		else{
+			if(!g_Shift){
+				g_WndList->MoveCursor(1);
+			}
+			else{
+				g_WndList->MoveCursor(-1);
+			}
+			InvalidateItem();
+		}
+		break;
+	case	VK_ESCAPE:
+		HideWindow();
+		break;
+	case	VK_UP:
+		g_WndList->MoveCursor(-1);
+		InvalidateItem();
+		break;
+	case	VK_DOWN:
+		g_WndList->MoveCursor(1);
+		InvalidateItem();
+		break;
+	case	VK_LSHIFT:
+	case	VK_RSHIFT:
+		g_Shift = TRUE;
+		break;
+	}
+}
+
+static void OnSpKeyUp(WPARAM wParam, LPARAM lParam)
+{
+	switch(wParam){
+	case	VK_LSHIFT:
+	case	VK_RSHIFT:
+		g_Shift = FALSE;
+		break;
+	case	VK_LMENU:
+	case	VK_RMENU:
+		if(IsWindowVisible(g_hWnd)){
+			g_WndList->Activate();
+			HideWindow();
+		}
+		break;
+	}
+}
+
+static void HideWindow(void)
+{
+	ShowWindow(g_hWnd, SW_HIDE);
+	g_WndList->RemoveAll();
 }

@@ -59,6 +59,7 @@ void CWndList::Create(CLauncher* launcher)
 	}
 }
 
+/*
 HICON CWndList::GetIcon(int idx, BOOL& need_destroy)
 {
 	CWndInfo*	info = (*this)[idx];
@@ -71,6 +72,7 @@ HICON CWndList::GetIcon(int idx, BOOL& need_destroy)
 		return info->GetIcon(need_destroy);
 	}
 }
+*/
 
 BOOL CWndList::MoveCursor(int dir)
 {
@@ -82,6 +84,25 @@ BOOL CWndList::MoveCursor(int dir)
 		m_cursor %= count;
 		(*this)[m_last_cursor]->SetSelect(FALSE);
 		(*this)[m_cursor]->SetSelect(TRUE);
+		return TRUE;
 	}
-	return TRUE;
+	return FALSE;
+}
+
+BOOL CWndList::SelectItem(int idx)
+{
+	int		count = GetCount();
+	if((idx < count) && (idx >= 0)){
+		m_last_cursor = m_cursor;
+		m_cursor = idx;
+		(*this)[m_last_cursor]->SetSelect(FALSE);
+		(*this)[m_cursor]->SetSelect(TRUE);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void CWndList::Activate(void)
+{
+	(*this)[m_cursor]->SetActive();
 }
