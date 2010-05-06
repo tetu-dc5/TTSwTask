@@ -15,7 +15,7 @@ CImageList::~CImageList(void)
 
 BOOL CImageList::Create(void)
 {
-	m_hImageList = ImageList_Create(16, 16, ILC_COLOR32|ILC_MASK, 0, 50);
+	m_hImageList = ImageList_Create(16, 16, ILC_COLOR32|ILC_MASK, 0, 30);
 	if(m_hImageList) return TRUE;
 	return FALSE;
 }

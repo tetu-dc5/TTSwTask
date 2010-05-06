@@ -6,7 +6,11 @@
 #include <shellapi.h>
 #include "..\KbHook\KbHook.h"
 
+#define	USE_GRADIENT
+
+#ifdef USE_GRADIENT
 #pragma	comment(lib, "msimg32.lib")
+#endif
 
 #define		ENABLE_HOOK		1
 
@@ -44,14 +48,16 @@ static void	OnPaint(HWND hwnd, HDC hdc);
 static void	GetIniPath(void);
 static void	OnListUpdate(void);
 static void	GetItemRect(int idx, LPRECT lpRect);
+#ifdef USE_GRADIENT
 static void	FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2);
+#endif
 static void	OnDestroy(HWND hwnd);
 static void	InvalidateItem(void);
-static int		GetItemWidth(LPCTSTR title);
+static int	GetItemWidth(LPCTSTR title);
 static void	MenuOpen(void);
 static void	OnSpKeyDown(WPARAM wParam, LPARAM lParam);
 static void	OnSpKeyUp(WPARAM wParam, LPARAM lParam);
-static int		PointToItem(POINTS pt);
+static int	PointToItem(POINTS pt);
 static void	HideWindow(void);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
@@ -80,7 +86,7 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize         = sizeof(WNDCLASSEX);
-	wcex.style			= CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wcex.style			= CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc	= WndProc;
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
@@ -96,14 +102,12 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 
 static void GetIniPath(void)
 {
-	TCHAR	me[1024];
-	GetModuleFileName(NULL, me, 1024);
-	TCHAR* pExt = _tcsrchr(me,_T('.'));
+	TCHAR	me[TMP_BUF_SIZE];
+	GetModuleFileName(NULL, me, TMP_BUF_SIZE);
+	TCHAR* pExt = _tcsrchr(me, _T('.'));
 	*pExt = _T('\0');
-	_tcscat_s(me,1024,_T(".ini"));
-	int len = _tcslen(me);
-	g_IniPath = new TCHAR[len+10];
-	_tcscpy_s((LPTSTR)g_IniPath, len+10, me);
+	_tcscat_s(me, TMP_BUF_SIZE, _T(".ini"));
+	g_IniPath = CopyString(me);
 }
 
 static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
@@ -312,6 +316,7 @@ static void InvalidateItem(void)
 	}
 }
 
+#ifdef USE_GRADIENT
 static void FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2)
 {
 	TRIVERTEX		vt[2];
@@ -336,24 +341,27 @@ static void FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2)
 
 	GradientFill(hdc, vt, 2, &rc, 1, GRADIENT_FILL_RECT_H);
 }
+#endif
 
 static void OnPaint(HWND hwnd, HDC hdc)
 {
 	HGDIOBJ old_font = SelectObject(hdc, g_NormalFont);
 	
 	int count = g_WndList->GetCount();
-	int		y = 0;
-	int		x = 0;
 	SetBkMode(hdc, TRANSPARENT);
 	UINT	ImageStyle = ILD_NORMAL;
 	RECT	rect;
+	CWndInfo*	info = (CWndInfo*)g_WndList->GetTop(0);
+	GetItemRect(0, &rect);
 	for(int i=0;i<count;i++)
 	{
-		CWndInfo*	info = (*g_WndList)[i];
-		GetItemRect(i, &rect);
 		if(info->IsSelected())
 		{
+#ifdef USE_GRADIENT
 			FillGradient(hdc, &rect, GetSysColor(COLOR_ACTIVECAPTION), GetSysColor(COLOR_GRADIENTACTIVECAPTION));
+#else
+			FillRect(hdc, &rect, (HBRUSH)(COLOR_ACTIVECAPTION+1));
+#endif
 			SetTextColor(hdc, GetSysColor(COLOR_CAPTIONTEXT));
 		}
 		else{
@@ -374,9 +382,11 @@ static void OnPaint(HWND hwnd, HDC hdc)
 			SelectObject(hdc, g_NormalFont);
 			ImageStyle = ILD_NORMAL;
 		}
-		g_ImageList->Draw(i, hdc, x+g_ItemIconX, y+g_ItemIconY, ImageStyle);
-		TextOut(hdc, x+g_ItemTextX, y+g_ItemTextY, info->GetTitle(), _tcslen(info->GetTitle()));
-		y+=g_ItemHeight;
+		g_ImageList->Draw(i, hdc, g_ItemIconX, rect.top+g_ItemIconY, ImageStyle);
+		TextOut(hdc, g_ItemTextX, rect.top+g_ItemTextY, info->GetTitle(), _tcslen(info->GetTitle()));
+		info = (CWndInfo*)info->GetNext(0);
+		rect.top    += g_ItemHeight;
+		rect.bottom += g_ItemHeight;
 	}
 	
 	SelectObject(hdc, old_font);
@@ -496,4 +506,15 @@ static void HideWindow(void)
 {
 	ShowWindow(g_hWnd, SW_HIDE);
 	g_WndList->RemoveAll();
+	g_ImageList->SetCount(0);
+}
+
+
+LPTSTR CopyString(LPCTSTR src)
+{
+	if(!src[0]) return NULL;
+	int		len = _tcslen(src)+10;
+	LPTSTR	buf = new TCHAR[len];
+	_tcscpy_s(buf, len, src);
+	return buf;
 }
