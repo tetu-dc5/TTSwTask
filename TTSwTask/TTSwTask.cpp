@@ -3,26 +3,32 @@
 
 #include "stdafx.h"
 #include "TTSwTask.h"
+#include <shellapi.h>
 
 #pragma	comment(lib, "msimg32.lib")
 
-HINSTANCE	g_hInst       = NULL;
-HWND		g_hWnd        = NULL;
-CImageList*	g_ImageList   = NULL;
-CWndList*	g_WndList     = NULL;
-CLauncher*	g_Launcher    = NULL;
-LPCTSTR		g_IniPath     = NULL;
-HGDIOBJ		g_NormalFont  = NULL;
-HGDIOBJ		g_LaunchFont  = NULL;
-LPCTSTR		g_AppName     = _T("TTSwTask");
-const int	g_ItemHeight  = 20;
-const int	g_ItemIconX   = 2;
-const int	g_ItemIconY   = 2;
-const int	g_ItemTextX   = 20;
-const int	g_ItemTextY   = 3;
-const int	g_MinWidth    = 400;
-const int	g_MaxWidth    = 800;
-const int	g_TextMargin  = 2;
+#define		WM_TASKICON		(WM_USER+1)
+
+HINSTANCE		g_hInst       = NULL;
+HWND			g_hWnd        = NULL;
+CImageList*		g_ImageList   = NULL;
+CWndList*		g_WndList     = NULL;
+CLauncher*		g_Launcher    = NULL;
+LPCTSTR			g_IniPath     = NULL;
+HGDIOBJ			g_NormalFont  = NULL;
+HGDIOBJ			g_LaunchFont  = NULL;
+LPCTSTR			g_AppName     = _T("TTSwTask");
+HMENU			g_AppMenu     = NULL;
+NOTIFYICONDATA	g_Notify;
+
+static const int	g_ItemHeight  = 20;
+static const int	g_ItemIconX   = 2;
+static const int	g_ItemIconY   = 2;
+static const int	g_ItemTextX   = 20;
+static const int	g_ItemTextY   = 3;
+static const int	g_MinWidth    = 400;
+static const int	g_MaxWidth    = 800;
+static const int	g_TextMargin  = 2;
 
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
@@ -36,6 +42,7 @@ void				FillGradient(HDC hdc, LPRECT lpRect, COLORREF col1, COLORREF col2);
 void				OnDestroy(HWND hwnd);
 void				InvalidateItem(int idx);
 int					GetItemWidth(LPCTSTR title);
+void				MenuOpen(void);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 {
@@ -94,7 +101,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND hWnd;
 	g_hInst = hInstance;
 	hWnd = CreateWindowEx(
-		WS_EX_DLGMODALFRAME,
+		WS_EX_DLGMODALFRAME|WS_EX_TOOLWINDOW,
 		g_AppName,
 		g_AppName, 
 		WS_POPUPWINDOW,
@@ -107,7 +114,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    if(!hWnd) return FALSE;
    g_hWnd = hWnd;
    
-   ShowWindow(hWnd, nCmdShow);
+   ShowWindow(hWnd, SW_HIDE);
    UpdateWindow(hWnd);
    
    return TRUE;
@@ -120,11 +127,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+	case WM_TASKICON:
+		if(lParam == WM_RBUTTONUP)
+		{
+			MenuOpen();
+		}
+		break;
+	case WM_COMMAND:
+		if(LOWORD(wParam) == ID_APP_QUIT)
+		{
+			PostMessage(hWnd, WM_CLOSE, 0, 0);
+		}
+		else if(LOWORD(wParam) == ID_VIEW_LIST)
+		{
+			OnListUpdate();
+		}
+		else if(LOWORD(wParam) == ID_UPDATE_CONFIG)
+		{
+		}
+		else
+		{
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+		break;
 	case WM_CREATE:
 		if(!OnCreate(hWnd)) return -1;
 		break;
 	case WM_LBUTTONDOWN:
-		OnListUpdate();
 		break;
 	case WM_KEYDOWN:
 		if(IsWindowVisible(hWnd)){
@@ -178,6 +207,20 @@ BOOL OnCreate(HWND hwnd)
 	g_NormalFont      = CreateFontIndirect(&logfont);
 	logfont.lfItalic  = TRUE;
 	g_LaunchFont      = CreateFontIndirect(&logfont);
+	g_AppMenu         = LoadMenu(g_hInst, MAKEINTRESOURCE(IDR_MENU1));
+
+	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK)));
+	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK)));
+
+	ZeroMemory(&g_Notify, sizeof(NOTIFYICONDATA));
+	g_Notify.cbSize = sizeof(NOTIFYICONDATA);
+	g_Notify.uID    = 1;
+	g_Notify.hWnd   = hwnd;
+	g_Notify.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+	g_Notify.hIcon  = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK));
+	g_Notify.uCallbackMessage = WM_TASKICON;
+	_tcscpy_s(g_Notify.szTip, 64, g_AppName);
+	Shell_NotifyIcon(NIM_ADD, &g_Notify);
 
 	OnListUpdate();
 	
@@ -186,6 +229,8 @@ BOOL OnCreate(HWND hwnd)
 
 void OnDestroy(HWND hwnd)
 {
+	Shell_NotifyIcon(NIM_DELETE, &g_Notify);
+	DestroyMenu(g_AppMenu);
 	if(g_ImageList) delete g_ImageList;
 	DeleteObject(g_NormalFont);
 	DeleteObject(g_LaunchFont);
@@ -320,4 +365,14 @@ void OnListUpdate(void)
 	int y  = (sh - wh) / 2;
 	SetWindowPos(g_hWnd, (HWND)HWND_TOPMOST, x, y, ww, wh, SWP_SHOWWINDOW|SWP_NOCOPYBITS);
 	InvalidateRect(g_hWnd, NULL, TRUE);
+}
+
+void MenuOpen(void)
+{
+	POINT	pt;
+	
+	SetForegroundWindow(g_hWnd);
+	GetCursorPos(&pt);
+	HMENU hSub = GetSubMenu(g_AppMenu, 0);
+	TrackPopupMenu(hSub, TPM_LEFTALIGN|TPM_BOTTOMALIGN|TPM_LEFTBUTTON, pt.x, pt.y, 0, g_hWnd, NULL);
 }

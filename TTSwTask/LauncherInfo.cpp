@@ -14,31 +14,11 @@ CLauncherInfo::CLauncherInfo(void)
 
 CLauncherInfo::~CLauncherInfo(void)
 {
-	if(m_Arg)
-	{
-		delete [] m_Arg;
-		m_Arg = NULL;
-	}
-	if(m_WorkDirectory)
-	{
-		delete [] m_WorkDirectory;
-		m_WorkDirectory = NULL;
-	}
-	if(m_CheckModulePath)
-	{
-		delete [] m_CheckModulePath;
-		m_CheckModulePath = NULL;
-	}
-	if(m_CheckTitle)
-	{
-		delete [] m_CheckTitle;
-		m_CheckTitle = NULL;
-	}
-	if(m_IconPath)
-	{
-		delete [] m_IconPath;
-		m_IconPath = NULL;
-	}
+	if(m_Arg)				delete [] m_Arg;
+	if(m_WorkDirectory)		delete [] m_WorkDirectory;
+	if(m_CheckModulePath)	delete [] m_CheckModulePath;
+	if(m_CheckTitle)		delete [] m_CheckTitle;
+	if(m_IconPath)			delete [] m_IconPath;
 }
 
 HICON CLauncherInfo::GetIcon(BOOL& need_destroy)

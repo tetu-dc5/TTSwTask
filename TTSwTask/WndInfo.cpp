@@ -29,16 +29,8 @@ CWndInfo::CWndInfo(int channel)
 
 CWndInfo::~CWndInfo(void)
 {
-	if(m_ModulePath)
-	{
-		delete [] m_ModulePath;
-		m_ModulePath = NULL;
-	}
-	if(m_Title)
-	{
-		delete [] m_Title;
-		m_Title = NULL;
-	}
+	if(m_ModulePath)	delete [] m_ModulePath;
+	if(m_Title)			delete [] m_Title;
 }
 
 HICON CWndInfo::_GetIcon(HWND hwnd, BOOL& need_destroy)
