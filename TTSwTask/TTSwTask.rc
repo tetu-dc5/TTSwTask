@@ -33,7 +33,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_TTSWTASK            ICON                    "Resource\\network_center.ico"
+IDI_TTSWTASK            ICON                    "Resource\\VSProject_genericproject.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -79,6 +79,44 @@ BEGIN
         MENUITEM "リスト表示(&V)",                   ID_VIEW_LIST, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "終了(&X)",                      ID_APP_QUIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "FileDescription", "TTSwTask アプリケーション"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "TTSwTask"
+            VALUE "LegalCopyright", "Copyright (C) 2010"
+            VALUE "OriginalFilename", "TTSwTask.exe"
+            VALUE "ProductName", "TTSwTask アプリケーション"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
     END
 END
 
