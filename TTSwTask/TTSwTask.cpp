@@ -248,7 +248,7 @@ static BOOL OnCreate(HWND hwnd)
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &NcMetrics, 0);
 	logfont = NcMetrics.lfMenuFont;
 	logfont.lfHeight  = 15;
-	logfont.lfWeight  = FW_MEDIUM;
+	logfont.lfWeight  = FW_NORMAL;
 	logfont.lfQuality = DEFAULT_QUALITY;
 	g_NormalFont      = CreateFontIndirect(&logfont);
 	logfont.lfItalic  = TRUE;
