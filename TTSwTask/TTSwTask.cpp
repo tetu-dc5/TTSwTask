@@ -249,7 +249,7 @@ static BOOL OnCreate(HWND hwnd)
 	logfont = NcMetrics.lfMenuFont;
 	logfont.lfHeight  = 15;
 	logfont.lfWeight  = FW_MEDIUM;
-	logfont.lfQuality = NONANTIALIASED_QUALITY;	//DEFAULT_QUALITY;
+	logfont.lfQuality = DEFAULT_QUALITY;
 	g_NormalFont      = CreateFontIndirect(&logfont);
 	logfont.lfItalic  = TRUE;
 	g_LaunchFont      = CreateFontIndirect(&logfont);
