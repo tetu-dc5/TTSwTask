@@ -82,6 +82,17 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	return (int) msg.wParam;
 }
 
+static HICON GetResourceIconHandle(bool small)
+{
+	int cx_index = SM_CXICON;
+	int cy_index = SM_CYICON;
+	if(small){
+		cx_index = SM_CXSMICON;
+		cy_index = SM_CYSMICON;
+	}
+	return (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK), IMAGE_ICON, GetSystemMetrics(cx_index), GetSystemMetrics(cy_index), 0);
+}
+
 static ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
@@ -91,12 +102,12 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_TTSWTASK));
+	wcex.hIcon			= GetResourceIconHandle(false);
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_3DFACE+1);
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= g_AppName;
-	wcex.hIconSm		= NULL;
+	wcex.hIconSm		= GetResourceIconHandle(true);
 	return RegisterClassEx(&wcex);
 }
 
@@ -255,15 +266,15 @@ static BOOL OnCreate(HWND hwnd)
 	g_LaunchFont      = CreateFontIndirect(&logfont);
 	g_AppMenu         = LoadMenu(g_hInst, MAKEINTRESOURCE(IDR_MENU1));
 
-	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK)));
-	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK)));
+	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG,   (LPARAM)GetResourceIconHandle(false));
+	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)GetResourceIconHandle(true));
 
 	ZeroMemory(&g_Notify, sizeof(NOTIFYICONDATA));
 	g_Notify.cbSize = sizeof(NOTIFYICONDATA);
 	g_Notify.uID    = 1;
 	g_Notify.hWnd   = hwnd;
 	g_Notify.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	g_Notify.hIcon  = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK));
+	g_Notify.hIcon  = GetResourceIconHandle(true);
 	g_Notify.uCallbackMessage = WM_TASKICON;
 	_tcscpy_s(g_Notify.szTip, 64, g_AppName);
 	Shell_NotifyIcon(NIM_ADD, &g_Notify);
