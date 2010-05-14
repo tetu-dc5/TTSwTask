@@ -21,19 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2A5F48017AF84821A9127AD55C88D15B"
-        "OwnerKey" = "8:_7687535173404790911A18AE7C9125EC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_424A4FB719F3F39B5E95DA40F08122A0"
-        "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7687535173404790911A18AE7C9125EC"
         "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -64,6 +52,18 @@
         "Entry"
         {
         "MsmKey" = "8:_C13AB357C2B3AA1B0FE17001CA581D17"
+        "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D59404C77C8046D182C8C986CE358789"
+        "OwnerKey" = "8:_EE7482BB378B45AFA107C7FDDD3B1FB8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EE7482BB378B45AFA107C7FDDD3B1FB8"
         "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -321,14 +321,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TTSwTask"
-        "ProductCode" = "8:{6941A358-E646-415A-A83F-62EFB7E9DA33}"
-        "PackageCode" = "8:{D4D0B275-9DE0-4A33-A8B8-BB9A39F2DAC6}"
+        "ProductCode" = "8:{7FCB1301-5773-4EF4-933A-5FFF85B7DC1D}"
+        "PackageCode" = "8:{85DDA7C9-8BA9-4DB8-B73E-78714445DDDA}"
         "UpgradeCode" = "8:{6F4A324B-9B0F-46B7-BCEF-8878DE3C5523}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.1"
+        "ProductVersion" = "8:1.0.3"
         "Manufacturer" = "8:TUBO-DC5"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -865,7 +865,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_2A5F48017AF84821A9127AD55C88D15B"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D59404C77C8046D182C8C986CE358789"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -879,7 +879,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_7687535173404790911A18AE7C9125EC"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_EE7482BB378B45AFA107C7FDDD3B1FB8"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
