@@ -172,6 +172,11 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			HideWindow();
 			g_Launcher->ReadFromFile(g_IniPath);
 		}
+		else if(LOWORD(wParam) == ID_EDIT_CONFIG)
+		{
+			HideWindow();
+			ShellExecute(NULL, NULL, g_IniPath, NULL, NULL, SW_SHOW);
+		}
 		else
 		{
 			return DefWindowProc(hWnd, message, wParam, lParam);

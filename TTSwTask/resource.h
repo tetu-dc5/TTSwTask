@@ -9,7 +9,7 @@
 #define IDR_MENU1                       130
 #define ID_32771                        32771
 #define ID_UPDATE_CONFIG                32772
-#define ID_32773                        32773
+#define ID_EDIT_CONFIG                  32773
 #define ID_APP_QUIT                     32774
 #define ID_32775                        32775
 #define ID_VIEW_LIST                    32776
