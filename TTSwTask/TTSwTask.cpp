@@ -23,6 +23,7 @@ HWND			g_hWnd        = NULL;
 CImageList*		g_ImageList   = NULL;
 CWndList*		g_WndList     = NULL;
 CLauncher*		g_Launcher    = NULL;
+CEditIniFile*	g_EditIni     = NULL;
 LPCTSTR			g_IniPath     = NULL;
 HGDIOBJ			g_NormalFont  = NULL;
 HGDIOBJ			g_LaunchFont  = NULL;
@@ -67,6 +68,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	GetIniPath();
 	g_WndList  = new CWndList();
 	g_Launcher = new CLauncher();
+	g_EditIni = new CEditIniFile();
 	g_Launcher->ReadFromFile(g_IniPath);
 
 	MyRegisterClass(hInstance);
@@ -77,6 +79,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 		DispatchMessage(&msg);
 	}
 	delete [] g_IniPath;
+	delete g_EditIni;
 	delete g_WndList;
 	delete g_Launcher;
 	return (int) msg.wParam;
@@ -175,7 +178,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		else if(LOWORD(wParam) == ID_EDIT_CONFIG)
 		{
 			HideWindow();
-			ShellExecute(NULL, NULL, g_IniPath, NULL, NULL, SW_SHOW);
+			g_EditIni->Start(g_IniPath, hWnd, WM_COMMAND, ID_UPDATE_CONFIG);
 		}
 		else
 		{
