@@ -487,6 +487,7 @@ static void OnSpKeyDown(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case	VK_ESCAPE:
+	case	VK_KANJI:
 		HideWindow();
 		break;
 	case	VK_UP:
