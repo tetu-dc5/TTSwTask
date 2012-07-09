@@ -44,6 +44,7 @@ static const int	g_TextMargin  = 2;
 static LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 static ATOM	MyRegisterClass(HINSTANCE hInstance);
 static BOOL	InitInstance(HINSTANCE, int);
+static void CreateNotifyIcon(HWND hwnd);
 static BOOL	OnCreate(HWND hwnd);
 static void	OnPaint(HWND hwnd, HDC hdc);
 static void	GetIniPath(void);
@@ -152,108 +153,130 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 {
 	PAINTSTRUCT ps;
 	HDC hdc;
+	static	UINT	uiTaskbarRestart = 0xFFFFFFFF;
 
-	switch (message)
+	if(message == uiTaskbarRestart)
 	{
-	case WM_TASKICON:
-		if(lParam == WM_RBUTTONUP)
+		//	’Ê’mƒAƒCƒRƒ“‚ÌÄ“o˜^
+		CreateNotifyIcon(hWnd);
+	}
+	else{
+		switch (message)
 		{
-			MenuOpen();
-		}
-		break;
-	case WM_COMMAND:
-		if(LOWORD(wParam) == ID_APP_QUIT)
-		{
-			PostMessage(hWnd, WM_CLOSE, 0, 0);
-		}
-		else if(LOWORD(wParam) == ID_VIEW_LIST)
-		{
-			OnListUpdate();
-		}
-		else if(LOWORD(wParam) == ID_UPDATE_CONFIG)
-		{
-			HideWindow();
-			g_Launcher->ReadFromFile(g_IniPath);
-		}
-		else if(LOWORD(wParam) == ID_EDIT_CONFIG)
-		{
-			HideWindow();
-			g_EditIni->Start(g_IniPath, hWnd, WM_COMMAND, ID_UPDATE_CONFIG);
-		}
-		else
-		{
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
-	case WM_CREATE:
-		if(!OnCreate(hWnd)) return -1;
-		break;
-	#if ENABLE_HOOK
-	case WM_SP_KEYDOWN:
-		OnSpKeyDown(wParam, lParam);
-		break;
-	case WM_SP_KEYUP:
-		OnSpKeyUp(wParam, lParam);
-		break;
-	#else
-	case WM_KEYDOWN:
-		if(wParam==VK_DOWN)
-		{
-			g_WndList->MoveCursor(1);
-			InvalidateItem();
-		}
-		else if(wParam==VK_UP)
-		{
-			g_WndList->MoveCursor(-1);
-			InvalidateItem();
-		}
-		else if(wParam==VK_RETURN)
-		{
-			g_WndList->Activate();
-			HideWindow();
-		}
-		else
-		{
-			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-	#endif
-	case WM_LBUTTONDOWN:
-		if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
-		{
-			InvalidateItem();
-		}
-		break;
-	case WM_LBUTTONUP:
-		if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
-		{
-			g_WndList->Activate();
-			HideWindow();
-		}
-		break;
-	case WM_MOUSEMOVE:
-		if(wParam & MK_LBUTTON){
+		case WM_TASKICON:
+			if(lParam == WM_RBUTTONUP)
+			{
+				MenuOpen();
+			}
+			break;
+		case WM_COMMAND:
+			if(LOWORD(wParam) == ID_APP_QUIT)
+			{
+				PostMessage(hWnd, WM_CLOSE, 0, 0);
+			}
+			else if(LOWORD(wParam) == ID_VIEW_LIST)
+			{
+				OnListUpdate();
+			}
+			else if(LOWORD(wParam) == ID_UPDATE_CONFIG)
+			{
+				HideWindow();
+				g_Launcher->ReadFromFile(g_IniPath);
+			}
+			else if(LOWORD(wParam) == ID_EDIT_CONFIG)
+			{
+				HideWindow();
+				g_EditIni->Start(g_IniPath, hWnd, WM_COMMAND, ID_UPDATE_CONFIG);
+			}
+			else
+			{
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+			break;
+		case WM_CREATE:
+			if(!OnCreate(hWnd)) return -1;
+			uiTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
+			break;
+		#if ENABLE_HOOK
+		case WM_SP_KEYDOWN:
+			OnSpKeyDown(wParam, lParam);
+			break;
+		case WM_SP_KEYUP:
+			OnSpKeyUp(wParam, lParam);
+			break;
+		#else
+		case WM_KEYDOWN:
+			if(wParam==VK_DOWN)
+			{
+				g_WndList->MoveCursor(1);
+				InvalidateItem();
+			}
+			else if(wParam==VK_UP)
+			{
+				g_WndList->MoveCursor(-1);
+				InvalidateItem();
+			}
+			else if(wParam==VK_RETURN)
+			{
+				g_WndList->Activate();
+				HideWindow();
+			}
+			else
+			{
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+		#endif
+		case WM_LBUTTONDOWN:
 			if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
 			{
 				InvalidateItem();
 			}
+			break;
+		case WM_LBUTTONUP:
+			if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
+			{
+				g_WndList->Activate();
+				HideWindow();
+			}
+			break;
+		case WM_MOUSEMOVE:
+			if(wParam & MK_LBUTTON){
+				if(g_WndList->SelectItem(PointToItem(MAKEPOINTS(lParam))))
+				{
+					InvalidateItem();
+				}
+			}
+			break;
+		case WM_PAINT:
+			hdc = BeginPaint(hWnd, &ps);
+			OnPaint(hWnd, hdc);
+			EndPaint(hWnd, &ps);
+			break;
+		case WM_CLOSE:
+			DestroyWindow(hWnd);
+			break;
+		case WM_DESTROY:
+			OnDestroy(hWnd);
+			PostQuitMessage(0);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
-		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		OnPaint(hWnd, hdc);
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		break;
-	case WM_DESTROY:
-		OnDestroy(hWnd);
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
+}
+
+static void CreateNotifyIcon(HWND hwnd)
+{
+	ZeroMemory(&g_Notify, sizeof(NOTIFYICONDATA));
+	g_Notify.cbSize = sizeof(NOTIFYICONDATA);
+	g_Notify.uID    = 1;
+	g_Notify.hWnd   = hwnd;
+	g_Notify.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+	g_Notify.hIcon  = GetResourceIconHandle(true);
+	g_Notify.uCallbackMessage = WM_TASKICON;
+	_tcscpy_s(g_Notify.szTip, 64, g_AppName);
+	Shell_NotifyIcon(NIM_ADD, &g_Notify);
 }
 
 static BOOL OnCreate(HWND hwnd)
@@ -277,15 +300,7 @@ static BOOL OnCreate(HWND hwnd)
 	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG,   (LPARAM)GetResourceIconHandle(false));
 	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)GetResourceIconHandle(true));
 
-	ZeroMemory(&g_Notify, sizeof(NOTIFYICONDATA));
-	g_Notify.cbSize = sizeof(NOTIFYICONDATA);
-	g_Notify.uID    = 1;
-	g_Notify.hWnd   = hwnd;
-	g_Notify.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	g_Notify.hIcon  = GetResourceIconHandle(true);
-	g_Notify.uCallbackMessage = WM_TASKICON;
-	_tcscpy_s(g_Notify.szTip, 64, g_AppName);
-	Shell_NotifyIcon(NIM_ADD, &g_Notify);
+	CreateNotifyIcon(hwnd);
 
 	#if ENABLE_HOOK
 	Hook(hwnd, WM_SP_KEYDOWN, WM_SP_KEYUP);	
