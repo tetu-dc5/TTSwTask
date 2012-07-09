@@ -7,12 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#ifndef APSTUDIO_INVOKED
-#include "targetver.h"
-#endif
-#define APSTUDIO_HIDDEN_SYMBOLS
-#include "windows.h"
-#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -25,15 +20,6 @@
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
 #endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_TTSWTASK            ICON                    "Resource\\St.ico"
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -48,12 +34,7 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
-    "#ifndef APSTUDIO_INVOKED\r\n"
-    "#include ""targetver.h""\r\n"
-    "#endif\r\n"
-    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
-    "#include ""windows.h""\r\n"
-    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""afxres.h""\r\n"
     "\0"
 END
 
@@ -64,25 +45,6 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDR_MENU1 MENU 
-BEGIN
-    POPUP "タスクトレイ"
-    BEGIN
-        MENUITEM "設定ファイルの更新(&U)",               ID_UPDATE_CONFIG
-        MENUITEM "設定ファイルの編集(&E)",               ID_EDIT_CONFIG
-        MENUITEM SEPARATOR
-        MENUITEM "リスト表示(&V)",                   ID_VIEW_LIST, GRAYED
-        MENUITEM SEPARATOR
-        MENUITEM "終了(&X)",                      ID_APP_QUIT
-    END
-END
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -100,19 +62,19 @@ VS_VERSION_INFO VERSIONINFO
  FILEFLAGS 0x0L
 #endif
  FILEOS 0x4L
- FILETYPE 0x1L
+ FILETYPE 0x2L
  FILESUBTYPE 0x0L
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "041104b0"
         BEGIN
-            VALUE "FileDescription", "TTSwTask アプリケーション"
+            VALUE "FileDescription", "KbHook ダイナミック リンク ライブラリ"
             VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "TTSwTask"
+            VALUE "InternalName", "KbHook"
             VALUE "LegalCopyright", "Copyright (C) 2010"
-            VALUE "OriginalFilename", "TTSwTask.exe"
-            VALUE "ProductName", "TTSwTask アプリケーション"
+            VALUE "OriginalFilename", "KbHook.dll"
+            VALUE "ProductName", "KbHook ダイナミック リンク ライブラリ"
             VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END

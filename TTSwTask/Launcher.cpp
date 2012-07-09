@@ -156,7 +156,7 @@ BOOL CLauncher::ReadFromFile(LPCTSTR fname)
 
 void CLauncher::AddListTo(CWndList* list)
 {
-	int	list_count = list->GetCount();
+	int	list_count = (!list) ? 0 : list->GetCount();
 	int launch_count = GetCount();
 
 	CLauncherInfo*	info = (CLauncherInfo*)GetTop();
@@ -165,24 +165,26 @@ void CLauncher::AddListTo(CWndList* list)
 		LPCTSTR	path  = (info->m_CheckModulePath) ? info->m_CheckModulePath : info->m_ModulePath;
 		LPCTSTR	title = info->m_CheckTitle;
 		BOOL	add = TRUE;
-		CWndInfo*	wnd = (CWndInfo*)list->GetTop();
-		while(wnd)
+		if(list)
 		{
-			if(!_tcsicmp(path, wnd->m_ModulePath))
+			CWndInfo*	wnd = (CWndInfo*)list->GetTop();
+			while(wnd)
 			{
-				if(!title || _tcsstr(wnd->m_Title, title)){
-					add = FALSE;
-					break;
+				if(wnd->m_ModulePath && !_tcsicmp(path, wnd->m_ModulePath))
+				{
+					if(!title || _tcsstr(wnd->m_Title, title)){
+						add = FALSE;
+						break;
+					}
 				}
+				wnd = (CWndInfo*)wnd->GetNext(0);
 			}
-			wnd = (CWndInfo*)wnd->GetNext(0);
 		}
 		if(add)
 		{
 			info->SetSelect(FALSE);
-			list->AddNode(info);
+			if(list) list->AddNode(info);
 		}
 		info = (CLauncherInfo*)info->GetNext(1);
 	}
-
 }

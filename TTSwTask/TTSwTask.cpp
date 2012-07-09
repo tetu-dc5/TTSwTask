@@ -23,6 +23,7 @@ HWND			g_hWnd        = NULL;
 CImageList*		g_ImageList   = NULL;
 CWndList*		g_WndList     = NULL;
 CLauncher*		g_Launcher    = NULL;
+CEditIniFile*	g_EditIni     = NULL;
 LPCTSTR			g_IniPath     = NULL;
 HGDIOBJ			g_NormalFont  = NULL;
 HGDIOBJ			g_LaunchFont  = NULL;
@@ -67,6 +68,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	GetIniPath();
 	g_WndList  = new CWndList();
 	g_Launcher = new CLauncher();
+	g_EditIni = new CEditIniFile();
 	g_Launcher->ReadFromFile(g_IniPath);
 
 	MyRegisterClass(hInstance);
@@ -77,9 +79,21 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 		DispatchMessage(&msg);
 	}
 	delete [] g_IniPath;
+	delete g_EditIni;
 	delete g_WndList;
 	delete g_Launcher;
 	return (int) msg.wParam;
+}
+
+static HICON GetResourceIconHandle(bool small)
+{
+	int cx_index = SM_CXICON;
+	int cy_index = SM_CYICON;
+	if(small){
+		cx_index = SM_CXSMICON;
+		cy_index = SM_CYSMICON;
+	}
+	return (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK), IMAGE_ICON, GetSystemMetrics(cx_index), GetSystemMetrics(cy_index), 0);
 }
 
 static ATOM MyRegisterClass(HINSTANCE hInstance)
@@ -91,12 +105,12 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_TTSWTASK));
+	wcex.hIcon			= GetResourceIconHandle(false);
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_3DFACE+1);
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= g_AppName;
-	wcex.hIconSm		= NULL;
+	wcex.hIconSm		= GetResourceIconHandle(true);
 	return RegisterClassEx(&wcex);
 }
 
@@ -160,6 +174,11 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		{
 			HideWindow();
 			g_Launcher->ReadFromFile(g_IniPath);
+		}
+		else if(LOWORD(wParam) == ID_EDIT_CONFIG)
+		{
+			HideWindow();
+			g_EditIni->Start(g_IniPath, hWnd, WM_COMMAND, ID_UPDATE_CONFIG);
 		}
 		else
 		{
@@ -248,22 +267,22 @@ static BOOL OnCreate(HWND hwnd)
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &NcMetrics, 0);
 	logfont = NcMetrics.lfMenuFont;
 	logfont.lfHeight  = 15;
-	logfont.lfWeight  = FW_MEDIUM;
-	logfont.lfQuality = NONANTIALIASED_QUALITY;	//DEFAULT_QUALITY;
+	logfont.lfWeight  = FW_NORMAL;
+	logfont.lfQuality = DEFAULT_QUALITY;
 	g_NormalFont      = CreateFontIndirect(&logfont);
 	logfont.lfItalic  = TRUE;
 	g_LaunchFont      = CreateFontIndirect(&logfont);
 	g_AppMenu         = LoadMenu(g_hInst, MAKEINTRESOURCE(IDR_MENU1));
 
-	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK)));
-	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK)));
+	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG,   (LPARAM)GetResourceIconHandle(false));
+	SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)GetResourceIconHandle(true));
 
 	ZeroMemory(&g_Notify, sizeof(NOTIFYICONDATA));
 	g_Notify.cbSize = sizeof(NOTIFYICONDATA);
 	g_Notify.uID    = 1;
 	g_Notify.hWnd   = hwnd;
 	g_Notify.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	g_Notify.hIcon  = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK));
+	g_Notify.hIcon  = GetResourceIconHandle(true);
 	g_Notify.uCallbackMessage = WM_TASKICON;
 	_tcscpy_s(g_Notify.szTip, 64, g_AppName);
 	Shell_NotifyIcon(NIM_ADD, &g_Notify);
@@ -468,6 +487,7 @@ static void OnSpKeyDown(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case	VK_ESCAPE:
+	case	VK_KANJI:
 		HideWindow();
 		break;
 	case	VK_UP:

@@ -28,6 +28,7 @@ static LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 			switch(lpKbInfo->vkCode){
 			case	VK_TAB:
 			case	VK_ESCAPE:
+			case	VK_KANJI:
 				fHandled = TRUE;
 			case	VK_LSHIFT:
 			case	VK_RSHIFT:

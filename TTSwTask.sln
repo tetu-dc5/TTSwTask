@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTSwTask", "TTSwTask\TTSwTa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KbHook", "KbHook\KbHook.vcproj", "{8E0D67E9-F601-4A64-BB37-B93F1FFA979A}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupTTSwTask", "SetupTTSwTask\SetupTTSwTask.vdproj", "{FE4F8959-D3C9-4FF7-AFA4-65B976B4E56D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +24,8 @@ Global
 		{8E0D67E9-F601-4A64-BB37-B93F1FFA979A}.Debug|Win32.Build.0 = Debug|Win32
 		{8E0D67E9-F601-4A64-BB37-B93F1FFA979A}.Release|Win32.ActiveCfg = Release|Win32
 		{8E0D67E9-F601-4A64-BB37-B93F1FFA979A}.Release|Win32.Build.0 = Release|Win32
+		{FE4F8959-D3C9-4FF7-AFA4-65B976B4E56D}.Debug|Win32.ActiveCfg = Debug
+		{FE4F8959-D3C9-4FF7-AFA4-65B976B4E56D}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
