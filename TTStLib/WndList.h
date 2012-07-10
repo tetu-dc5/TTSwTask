@@ -10,6 +10,7 @@ public:
 private:
 	int			m_cursor;
 	int			m_last_cursor;
+	HANDLE		m_hSnap;
 private:
 	static	BOOL			IsListup(HWND hwnd);
 	static	BOOL CALLBACK	EnumWindowProc(HWND hwnd, LPARAM lParam);

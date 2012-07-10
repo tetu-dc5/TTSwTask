@@ -26,7 +26,7 @@ public:
 			LPCTSTR	GetTitle(void)		{	return m_Title;					}
 	virtual	HICON	GetIcon(BOOL& need_destroy);
 	virtual	void	SetActive(void);
-			void	Setup(HWND hwnd);
+			void	Setup(HWND hwnd, HANDLE hSnap);
 			BOOL	Enable(void)		{	return m_Title ? (m_Title[0] ? TRUE : FALSE) : FALSE;	}
 			void	SetSelect(BOOL sw)	{	m_Selected = sw;				}
 			BOOL	IsSelected(void)	{	return m_Selected;				}

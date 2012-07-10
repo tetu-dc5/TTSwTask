@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "WndList.h"
+#include <Tlhelp32.h>
+
 
 CWndList::CWndList(void)
 : CInfoList(0)
@@ -32,7 +34,7 @@ BOOL CALLBACK CWndList::EnumWindowProc(HWND hwnd, LPARAM lParam)
 	if(IsListup(hwnd))
 	{
 		CWndInfo*	info = new CWndInfo();
-		info->Setup(hwnd);
+		info->Setup(hwnd, pThis->m_hSnap);
 		if(info->Enable())
 		{
 			pThis->AddNode(info);
@@ -48,7 +50,11 @@ BOOL CALLBACK CWndList::EnumWindowProc(HWND hwnd, LPARAM lParam)
 void CWndList::Create(CLauncher* launcher)
 {
 	RemoveAll();
+	m_hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	EnumChildWindows(NULL, EnumWindowProc, (LPARAM)this);
+	if(m_hSnap != INVALID_HANDLE_VALUE){
+		CloseHandle(m_hSnap);
+	}
 	if(launcher)
 	{
 		launcher->AddListTo(this);
