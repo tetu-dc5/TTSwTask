@@ -5,6 +5,7 @@
 #include "TTSwTask.h"
 #include <shellapi.h>
 #include "..\KbHook\KbHook.h"
+#include "util.h"
 
 #define	USE_GRADIENT
 
@@ -129,6 +130,8 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	HWND hWnd;
 	g_hInst = hInstance;
+	CWndInfo::SetDefaultIcon(hInstance, MAKEINTRESOURCE(IDI_TTSWTASK));
+
 	hWnd = CreateWindowEx(
 		WS_EX_DLGMODALFRAME|WS_EX_TOOLWINDOW,
 		g_AppName,
@@ -544,12 +547,3 @@ static void HideWindow(void)
 	g_ImageList->SetCount(0);
 }
 
-
-LPTSTR CopyString(LPCTSTR src)
-{
-	if(!src[0]) return NULL;
-	int		len = _tcslen(src)+10;
-	LPTSTR	buf = new TCHAR[len];
-	_tcscpy_s(buf, len, src);
-	return buf;
-}

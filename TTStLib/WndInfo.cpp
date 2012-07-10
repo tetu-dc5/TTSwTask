@@ -1,11 +1,19 @@
 #include "StdAfx.h"
-#include "TTSwTask.h"
+#include "util.h"
 #include "WndInfo.h"
 #include <psapi.h>
 #include <shellapi.h>
+#include <Tlhelp32.h>
 
 #pragma	comment(lib, "psapi.lib")
 #pragma	comment(lib, "shell32.lib")
+
+HICON	CWndInfo::m_DefaultIcon = NULL;
+
+void CWndInfo::SetDefaultIcon(HINSTANCE hInst, LPCWSTR id)
+{
+	m_DefaultIcon = LoadIcon(hInst, id);
+}
 
 CWndInfo::CWndInfo(void)
 : CInfoNode(0)
@@ -78,8 +86,12 @@ HICON CWndInfo::GetIcon(BOOL& need_destroy)
 		hIcon = _GetIcon(m_ModulePath, 0, need_destroy);
 		if(!hIcon)
 		{
-			need_destroy = FALSE;
-			hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK));
+			hIcon = (HICON)SendMessage(m_hWnd, WM_GETICON, ICON_BIG, NULL);
+			if(!hIcon)
+			{
+				need_destroy = FALSE;
+				hIcon = m_DefaultIcon;
+			}
 		}
 	}
 	return hIcon;
@@ -101,6 +113,19 @@ void CWndInfo::Setup(HWND hwnd)
 	GetWindowThreadProcessId(hwnd, &m_PID);
 	GetWindowText(hwnd, buf, TMP_BUF_SIZE);
 	m_Title = CopyString(buf);
+
+#if 0
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, m_PID);
+	if(hSnap){
+		MODULEENTRY32 me;
+		me.dwSize = sizeof(me);
+		BOOL bResult = Module32First(hSnap, &me);
+		if(bResult){
+			m_ModulePath = CopyString(me.szExePath);
+		}
+		CloseHandle(hSnap);
+	}
+#else
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, m_PID);
 	if(hProcess){
 		HMODULE hModule;
@@ -114,6 +139,7 @@ void CWndInfo::Setup(HWND hwnd)
 		}
 		CloseHandle(hProcess);
 	}
+#endif
 }
 
 void CWndInfo::SetActiveWindow(HWND hwnd)

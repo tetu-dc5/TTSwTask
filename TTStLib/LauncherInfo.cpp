@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "TTSwTask.h"
+#include "util.h"
 #include "LauncherInfo.h"
 
 CLauncherInfo::CLauncherInfo(void)

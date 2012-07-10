@@ -6,6 +6,9 @@ class CWndInfo : public CInfoNode
 {
 	friend	class CLauncher;
 public:
+	static HICON	m_DefaultIcon;
+	static void		SetDefaultIcon(HINSTANCE hInst, LPCWSTR id);
+public:
 	CWndInfo(void);
 	CWndInfo(int channel);
 	virtual ~CWndInfo(void);

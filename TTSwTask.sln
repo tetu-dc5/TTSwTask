@@ -3,12 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTSwTask", "TTSwTask\TTSwTask.vcproj", "{FA5699B0-FF65-4831-97BD-9461C3DC8B9F}"
 	ProjectSection(ProjectDependencies) = postProject
+		{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D} = {DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}
 		{8E0D67E9-F601-4A64-BB37-B93F1FFA979A} = {8E0D67E9-F601-4A64-BB37-B93F1FFA979A}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KbHook", "KbHook\KbHook.vcproj", "{8E0D67E9-F601-4A64-BB37-B93F1FFA979A}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupTTSwTask", "SetupTTSwTask\SetupTTSwTask.vdproj", "{FE4F8959-D3C9-4FF7-AFA4-65B976B4E56D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TTStLib", "TTStLib\TTStLib.vcproj", "{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +29,10 @@ Global
 		{8E0D67E9-F601-4A64-BB37-B93F1FFA979A}.Release|Win32.Build.0 = Release|Win32
 		{FE4F8959-D3C9-4FF7-AFA4-65B976B4E56D}.Debug|Win32.ActiveCfg = Debug
 		{FE4F8959-D3C9-4FF7-AFA4-65B976B4E56D}.Release|Win32.ActiveCfg = Release
+		{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}.Debug|Win32.Build.0 = Debug|Win32
+		{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}.Release|Win32.ActiveCfg = Release|Win32
+		{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

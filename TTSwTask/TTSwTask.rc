@@ -78,7 +78,7 @@ BEGIN
         MENUITEM "設定ファイルの更新(&U)",               ID_UPDATE_CONFIG
         MENUITEM "設定ファイルの編集(&E)",               ID_EDIT_CONFIG
         MENUITEM SEPARATOR
-        MENUITEM "リスト表示(&V)",                   ID_VIEW_LIST, GRAYED
+        MENUITEM "リスト表示(&V)",                   ID_VIEW_LIST
         MENUITEM SEPARATOR
         MENUITEM "終了(&X)",                      ID_APP_QUIT
     END

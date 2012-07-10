@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="TTSwTask"
-	ProjectGUID="{FA5699B0-FF65-4831-97BD-9461C3DC8B9F}"
-	RootNamespace="TTSwTask"
+	Name="TTStLib"
+	ProjectGUID="{DAAE6ACE-3836-4C3D-BB65-8898F33F8E2D}"
+	RootNamespace="TTStLib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)TTStLib&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,19 +60,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="2"
-				IgnoreAllDefaultLibraries="false"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-				AdditionalManifestFiles="$(InputDir)\TTSwTask.exe.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -84,9 +75,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -94,7 +82,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -115,18 +103,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="1"
-				InlineFunctionExpansion="0"
+				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="2"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)TTStLib&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				StringPooling="true"
-				ExceptionHandling="0"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -141,24 +123,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="1"
-				EnableUAC="false"
-				GenerateDebugInformation="false"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				OptimizeForWindows98="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-				AdditionalManifestFiles="$(InputDir)\TTSwTask.exe.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -168,9 +136,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -185,6 +150,30 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\EditIniFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ImageList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InfoList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InfoNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Launcher.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LauncherInfo.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\stdafx.cpp"
 				>
@@ -206,7 +195,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\TTSwTask.cpp"
+				RelativePath=".\util.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WndInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WndList.cpp"
 				>
 			</File>
 		</Filter>
@@ -216,7 +213,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Resource.h"
+				RelativePath=".\EditIniFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ImageList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\InfoList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\InfoNode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Launcher.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LauncherInfo.h"
 				>
 			</File>
 			<File
@@ -228,7 +245,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TTSwTask.h"
+				RelativePath=".\util.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WndInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WndList.h"
 				>
 			</File>
 		</Filter>
@@ -237,15 +262,11 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\Resource\St.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\TTSwTask.rc"
-				>
-			</File>
 		</Filter>
+		<File
+			RelativePath=".\ReadMe.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
