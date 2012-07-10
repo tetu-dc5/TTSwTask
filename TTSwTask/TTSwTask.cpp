@@ -80,6 +80,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	
 	delete [] g_IniPath;
 	delete g_EditIni;
 	delete g_WndList;
@@ -308,13 +309,20 @@ static BOOL OnCreate(HWND hwnd)
 	#if ENABLE_HOOK
 	Hook(hwnd, WM_SP_KEYDOWN, WM_SP_KEYUP);	
 	#endif
+
+	BOOL bResult;
+	bResult = RegisterHotKey(hwnd, 0, MOD_ALT, VK_TAB);
+	bResult = RegisterHotKey(hwnd, 1, MOD_ALT|MOD_SHIFT, VK_TAB);
 	
 	return TRUE;
 }
 
 static void OnDestroy(HWND hwnd)
 {
-	#if ENABLE_HOOK
+	UnregisterHotKey(hwnd, 0);
+	UnregisterHotKey(hwnd, 1);
+	
+#if ENABLE_HOOK
 	Unhook();	
 	#endif
 	Shell_NotifyIcon(NIM_DELETE, &g_Notify);
