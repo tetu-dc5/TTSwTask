@@ -7,6 +7,8 @@
 #include "..\KbHook\KbHook.h"
 #include "util.h"
 
+#include <Dwmapi.h>
+
 #define	USE_GRADIENT
 
 #ifdef USE_GRADIENT
@@ -88,11 +90,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	return (int) msg.wParam;
 }
 
-static HICON GetResourceIconHandle(bool small)
+static HICON GetResourceIconHandle(bool _small)
 {
 	int cx_index = SM_CXICON;
 	int cy_index = SM_CYICON;
-	if(small){
+	if(_small){
 		cx_index = SM_CXSMICON;
 		cy_index = SM_CYSMICON;
 	}
@@ -313,6 +315,9 @@ static BOOL OnCreate(HWND hwnd)
 	BOOL bResult;
 	bResult = RegisterHotKey(hwnd, 0, MOD_ALT, VK_TAB);
 	bResult = RegisterHotKey(hwnd, 1, MOD_ALT|MOD_SHIFT, VK_TAB);
+
+	MARGINS margins = {-1};
+	DwmExtendFrameIntoClientArea(hwnd, &margins);
 	
 	return TRUE;
 }
