@@ -114,20 +114,6 @@ void CWndInfo::Setup(HWND hwnd, HANDLE hSnap)
 	GetWindowText(hwnd, buf, TMP_BUF_SIZE);
 	m_Title = CopyString(buf);
 
-#if 1
-	if(hSnap!=INVALID_HANDLE_VALUE){
-		PROCESSENTRY32	me;
-		me.dwSize = sizeof(me);
-		BOOL bResult = Process32First(hSnap, &me);
-		while(bResult){
-			if(me.th32ProcessID==m_PID){
-				m_ModulePath = CopyString(me.szExeFile);
-				break;
-			}
-			bResult = Process32Next(hSnap, &me);
-		}
-	}
-#else
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, m_PID);
 	if(hProcess){
 		HMODULE hModule;
@@ -141,7 +127,18 @@ void CWndInfo::Setup(HWND hwnd, HANDLE hSnap)
 		}
 		CloseHandle(hProcess);
 	}
-#endif
+	else if(hSnap!=INVALID_HANDLE_VALUE){
+		PROCESSENTRY32	me;
+		me.dwSize = sizeof(me);
+		BOOL bResult = Process32First(hSnap, &me);
+		while(bResult){
+			if(me.th32ProcessID==m_PID){
+				m_ModulePath = CopyString(me.szExeFile);
+				break;
+			}
+			bResult = Process32Next(hSnap, &me);
+		}
+	}
 }
 
 void CWndInfo::SetActiveWindow(HWND hwnd)
