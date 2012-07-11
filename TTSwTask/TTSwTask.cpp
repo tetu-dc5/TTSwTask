@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "TTSwTask.h"
 #include <shellapi.h>
+#include <shlobj.h>
+#include <shlwapi.h>
 #include "..\KbHook\KbHook.h"
 #include "util.h"
 
@@ -12,6 +14,8 @@
 #ifdef USE_GRADIENT
 #pragma	comment(lib, "msimg32.lib")
 #endif
+
+#pragma comment(lib,"shlwapi.lib")
 
 #define		ENABLE_HOOK		1
 
@@ -88,11 +92,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	return (int) msg.wParam;
 }
 
-static HICON GetResourceIconHandle(bool small)
+static HICON GetResourceIconHandle(bool _small)
 {
 	int cx_index = SM_CXICON;
 	int cy_index = SM_CYICON;
-	if(small){
+	if(_small){
 		cx_index = SM_CXSMICON;
 		cy_index = SM_CYSMICON;
 	}
@@ -119,11 +123,12 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 
 static void GetIniPath(void)
 {
-	TCHAR	me[TMP_BUF_SIZE];
-	GetModuleFileName(NULL, me, TMP_BUF_SIZE);
-	TCHAR* pExt = _tcsrchr(me, _T('.'));
-	*pExt = _T('\0');
-	_tcscat_s(me, TMP_BUF_SIZE, _T(".ini"));
+	TCHAR	me[MAX_PATH];
+	
+	HRESULT hResult = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA|CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, me);
+	PathAppend(me, _T("TTSwTask"));
+	SHCreateDirectoryEx(NULL, me, NULL);
+	PathAppend(me, _T("TTSwTask.ini"));
 	g_IniPath = CopyString(me);
 }
 

@@ -21,19 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_424A4FB719F3F39B5E95DA40F08122A0"
-        "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8946ABC8112047918A392E9B279C641D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -41,6 +29,12 @@
         {
         "MsmKey" = "8:_9A9C8D1A9A8946F4AFAADF3E4A2C8A38"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9C12FFCB918B45B9A917590CE69AA765"
+        "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -57,14 +51,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D59404C77C8046D182C8C986CE358789"
-        "OwnerKey" = "8:_EE7482BB378B45AFA107C7FDDD3B1FB8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_EE7482BB378B45AFA107C7FDDD3B1FB8"
-        "OwnerKey" = "8:_7B12E29DD2004FCBA62104243A1F375D"
+        "MsmKey" = "8:_DF3D2DA9B14F4E1CA960A7A161DE4517"
+        "OwnerKey" = "8:_9C12FFCB918B45B9A917590CE69AA765"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -174,46 +162,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_424A4FB719F3F39B5E95DA40F08122A0"
-            {
-            "SourcePath" = "8:KbHook.dll"
-            "TargetName" = "8:KbHook.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_B4B56BE0520C4D65B49966886936FD53"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8946ABC8112047918A392E9B279C641D"
-            {
-            "SourcePath" = "8:..\\config_sample\\TTSwTask.ini"
-            "TargetName" = "8:TTSwTask.ini.sample"
-            "Tag" = "8:"
-            "Folder" = "8:_B4B56BE0520C4D65B49966886936FD53"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9A9C8D1A9A8946F4AFAADF3E4A2C8A38"
             {
             "SourcePath" = "8:..\\README"
@@ -305,6 +253,28 @@
                 {
                 }
             }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_CBA66BC842F74875AFDD4656DE99BE93"
+            {
+            "Name" = "8:#1915"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:AppDataFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_281B3C16E39941FEB07A702125B930D2"
+                    {
+                    "Name" = "8:TTSwTask"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_1AC42F73CBC044D78C8766C725FC8A53"
+                        "Folders"
+                        {
+                        }
+                    }
+                }
+            }
         }
         "LaunchCondition"
         {
@@ -322,7 +292,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TTSwTask"
         "ProductCode" = "8:{7FCB1301-5773-4EF4-933A-5FFF85B7DC1D}"
-        "PackageCode" = "8:{85DDA7C9-8BA9-4DB8-B73E-78714445DDDA}"
+        "PackageCode" = "8:{B73C64AF-5982-421B-9C96-1921EA148468}"
         "UpgradeCode" = "8:{6F4A324B-9B0F-46B7-BCEF-8878DE3C5523}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -865,11 +835,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D59404C77C8046D182C8C986CE358789"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_9C12FFCB918B45B9A917590CE69AA765"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -879,11 +849,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_EE7482BB378B45AFA107C7FDDD3B1FB8"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_DF3D2DA9B14F4E1CA960A7A161DE4517"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
                 "Properties"
                 {
                 }
