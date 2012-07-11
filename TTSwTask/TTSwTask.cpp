@@ -9,7 +9,10 @@
 #include "..\KbHook\KbHook.h"
 #include "util.h"
 
+#include <Dwmapi.h>
+
 #define	USE_GRADIENT
+#define USE_AERO
 
 #ifdef USE_GRADIENT
 #pragma	comment(lib, "msimg32.lib")
@@ -36,11 +39,16 @@ LPCTSTR			g_AppName     = _T("TTSwTask");
 HMENU			g_AppMenu     = NULL;
 NOTIFYICONDATA	g_Notify;
 BOOL			g_Shift       = FALSE;
+#ifdef USE_AERO
+BOOL			g_Aero        = TRUE;
+#else
+BOOL			g_Aero        = FALSE;
+#endif
 
 static const int	g_ItemHeight  = 20;
 static const int	g_ItemIconX   = 2;
 static const int	g_ItemIconY   = 2;
-static const int	g_ItemTextX   = 20;
+static const int	g_ItemTextX   = 22;
 static const int	g_ItemTextY   = 3;
 static const int	g_MinWidth    = 400;
 static const int	g_MaxWidth    = 800;
@@ -66,6 +74,8 @@ static void	OnSpKeyDown(WPARAM wParam, LPARAM lParam);
 static void	OnSpKeyUp(WPARAM wParam, LPARAM lParam);
 static int	PointToItem(POINTS pt);
 static void	HideWindow(void);
+static void SetAero(HWND hWnd);
+
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 {
@@ -76,6 +86,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
 	g_Launcher = new CLauncher();
 	g_EditIni = new CEditIniFile();
 	g_Launcher->ReadFromFile(g_IniPath);
+
+	BOOL enable = FALSE;
+	DwmIsCompositionEnabled( &enable );
+	if(!enable) g_Aero = FALSE;
 
 	MyRegisterClass(hInstance);
 	if (!InitInstance (hInstance, nCmdShow)) return FALSE;
@@ -103,10 +117,21 @@ static HICON GetResourceIconHandle(bool _small)
 	return (HICON)LoadImage(g_hInst, MAKEINTRESOURCE(IDI_TTSWTASK), IMAGE_ICON, GetSystemMetrics(cx_index), GetSystemMetrics(cy_index), 0);
 }
 
+static void SetAero(HWND hWnd)
+{
+	if(g_Aero)
+	{
+		MARGINS margin = { -1 };
+		DwmExtendFrameIntoClientArea(hWnd, &margin);
+	}
+}
+
 static ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
+	
 	wcex.cbSize         = sizeof(WNDCLASSEX);
+	
 	wcex.style			= CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc	= WndProc;
 	wcex.cbClsExtra		= 0;
@@ -114,7 +139,10 @@ static ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hInstance		= hInstance;
 	wcex.hIcon			= GetResourceIconHandle(false);
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_3DFACE+1);
+	if(g_Aero)
+		wcex.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
+	else
+		wcex.hbrBackground	= (HBRUSH)(COLOR_3DFACE+1);
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= g_AppName;
 	wcex.hIconSm		= GetResourceIconHandle(true);
@@ -139,10 +167,10 @@ static BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	CWndInfo::SetDefaultIcon(hInstance, MAKEINTRESOURCE(IDI_TTSWTASK));
 
 	hWnd = CreateWindowEx(
-		WS_EX_DLGMODALFRAME|WS_EX_TOOLWINDOW,
+		(WS_EX_DLGMODALFRAME | WS_EX_TOOLWINDOW),
 		g_AppName,
-		g_AppName, 
-		WS_POPUPWINDOW,
+		_T(""), 
+		(g_Aero ? WS_OVERLAPPED : WS_POPUPWINDOW),
 		100, 100, 
 		400, 300,
 		NULL, 
@@ -204,7 +232,11 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			break;
 		case WM_CREATE:
 			if(!OnCreate(hWnd)) return -1;
+			SetAero(hWnd);
 			uiTaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
+			break;
+		case WM_DWMCOMPOSITIONCHANGED:
+			SetAero(hWnd);
 			break;
 		#if ENABLE_HOOK
 		case WM_SP_KEYDOWN:
@@ -339,13 +371,16 @@ static void OnDestroy(HWND hwnd)
 
 static void GetItemRect(int idx, LPRECT lpRect)
 {
+	int offset = g_Aero ? 2 : 0;
 	RECT	client;
 	GetClientRect(g_hWnd, &client);
 	
+	
+	
 	lpRect->left   = 0;
-	lpRect->top    = idx * g_ItemHeight;
+	lpRect->top    = idx * g_ItemHeight + offset;
 	lpRect->right  = client.right-1;
-	lpRect->bottom = (idx+1) * g_ItemHeight;
+	lpRect->bottom = (idx+1) * g_ItemHeight + offset;
 }
 
 static int PointToItem(POINTS pt)
@@ -415,12 +450,23 @@ static void OnPaint(HWND hwnd, HDC hdc)
 			SetTextColor(hdc, GetSysColor(COLOR_CAPTIONTEXT));
 		}
 		else{
-			if(info->IsLauncher())
-			{
-				SetTextColor(hdc, GetSysColor(COLOR_3DSHADOW));
+			if(g_Aero){
+				if(info->IsLauncher())
+				{
+					SetTextColor(hdc, GetSysColor(COLOR_3DDKSHADOW));
+				}
+				else{
+					SetTextColor(hdc, GetSysColor(COLOR_3DSHADOW));
+				}
 			}
 			else{
-				SetTextColor(hdc, GetSysColor(COLOR_MENUTEXT));
+				if(info->IsLauncher())
+				{
+					SetTextColor(hdc, GetSysColor(COLOR_3DSHADOW));
+				}
+				else{
+					SetTextColor(hdc, GetSysColor(COLOR_MENUTEXT));
+				}
 			}
 		}
 		if(info->IsLauncher())
@@ -476,7 +522,7 @@ static void OnListUpdate(void)
 		}
 	}
 	int fw = GetSystemMetrics(SM_CXFRAME) * 2;
-	int fh = GetSystemMetrics(SM_CYFRAME) * 2;
+	int fh = GetSystemMetrics(SM_CYFRAME) * 2 + (g_Aero ? GetSystemMetrics(SM_CYCAPTION) : 0);
 	int ww = width + g_ItemTextX + fw;
 	if(ww<g_MinWidth) ww = g_MinWidth;
 	if(ww>g_MaxWidth) ww = g_MaxWidth;
@@ -486,6 +532,8 @@ static void OnListUpdate(void)
 	int x  = (sw - ww) / 2;
 	int y  = (sh - wh) / 2;
 	SetWindowPos(g_hWnd, (HWND)HWND_TOPMOST, x, y, ww, wh, SWP_SHOWWINDOW|SWP_NOCOPYBITS);
+	
+	
 	InvalidateRect(g_hWnd, NULL, TRUE);
 	CWndInfo::SetActiveWindow(g_hWnd);
 }
