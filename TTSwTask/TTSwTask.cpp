@@ -11,8 +11,9 @@
 
 #include <Dwmapi.h>
 
+#define WM_DWMCOMPOSITIONCHANGED        0x031E
+
 #define	USE_GRADIENT
-#define USE_AERO
 
 #ifdef USE_GRADIENT
 #pragma	comment(lib, "msimg32.lib")
@@ -39,11 +40,7 @@ LPCTSTR			g_AppName     = _T("TTSwTask");
 HMENU			g_AppMenu     = NULL;
 NOTIFYICONDATA	g_Notify;
 BOOL			g_Shift       = FALSE;
-#ifdef USE_AERO
-BOOL			g_Aero        = TRUE;
-#else
 BOOL			g_Aero        = FALSE;
-#endif
 
 static const int	g_ItemHeight  = 20;
 static const int	g_ItemIconX   = 2;
@@ -77,10 +74,16 @@ static void	HideWindow(void);
 static void SetAero(HWND hWnd);
 
 
-int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow)
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE, LPTSTR lpCmdLine, int nCmdShow)
 {
 	MSG msg;
 
+	
+	if(_tcsstr(lpCmdLine, _T("/glass")))
+	{
+		g_Aero = TRUE;
+	}
+	
 	GetIniPath();
 	g_WndList  = new CWndList();
 	g_Launcher = new CLauncher();
